@@ -1,0 +1,59 @@
+<div class="login-container">
+  <div class="login-card">
+    <div class="login-header">
+      <h1>Gestion des Employés</h1>
+      <h2>Connexion</h2>
+    </div>
+    
+    <div class="login-content">
+      <form (ngSubmit)="login()" #loginForm="ngForm">
+        <div class="form-field">
+          <label for="username">Nom d'utilisateur</label>
+          <input 
+            type="text" 
+            id="username" 
+            name="username" 
+            [(ngModel)]="username" 
+            required
+            placeholder="Entrez votre nom d'utilisateur"
+            [disabled]="isLoading">
+        </div>
+
+        <div class="form-field">
+          <label for="password">Mot de passe</label>
+          <input 
+            type="password" 
+            id="password" 
+            name="password" 
+            [(ngModel)]="password" 
+            required
+            placeholder="Entrez votre mot de passe"
+            [disabled]="isLoading">
+        </div>
+
+        <div *ngIf="error" class="error-message">
+          <span class="error-icon">⚠</span>
+          {{ error }}
+        </div>
+
+        <button 
+          type="submit" 
+          class="login-button" 
+          [disabled]="isLoading || !loginForm.form.valid">
+          <span *ngIf="!isLoading">Se connecter</span>
+          <span *ngIf="isLoading">Connexion...</span>
+        </button>
+      </form>
+
+      <div class="demo-credentials">
+        <h4>Identifiants de démonstration :</h4>
+        <div class="credential-item">
+          <strong>Admin:</strong> admin / admin123
+        </div>
+        <div class="credential-item">
+          <strong>Utilisateur:</strong> user / user123
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,152 @@
+<div class="employee-list-container">
+  <!-- En-tête avec titre et bouton d'ajout -->
+  <div class="header-section">
+    <div class="title-section">
+      <h1>
+        <span class="icon">👥</span>
+        Gestion des Employés
+      </h1>
+      <p class="subtitle">Liste complète des employés de l'entreprise</p>
+    </div>
+    <button class="add-button" (click)="router.navigate(['/employees/new'])">
+      <span class="button-icon">+</span>
+      Nouvel Employé
+    </button>
+  </div>
+
+  <!-- Statistiques -->
+  <div class="stats-section" *ngIf="!isLoading">
+    <div class="stat-card">
+      <div class="stat-icon">📊</div>
+      <div class="stat-content">
+        <div class="stat-value">{{ getTotalEmployees() }}</div>
+        <div class="stat-label">Employés totaux</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">💰</div>
+      <div class="stat-content">
+        <div class="stat-value">{{ averageSalary | number:'1.0-0' }} €</div>
+        <div class="stat-label">Salaire moyen</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">📈</div>
+      <div class="stat-content">
+        <div class="stat-value">{{ getCurrentAverageSalary() | number:'1.0-0' }} €</div>
+        <div class="stat-label">Moyenne filtrée</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filtres et recherche -->
+  <div class="filters-section" *ngIf="!isLoading">
+    <div class="search-box">
+      <div class="search-input-container">
+        <input 
+          type="text" 
+          [(ngModel)]="searchKeyword" 
+          (input)="searchEmployees()"
+          placeholder="Rechercher un employé..."
+          class="search-input">
+        <span class="search-icon">🔍</span>
+      </div>
+    </div>
+
+    <div class="filter-controls">
+      <select 
+        [(ngModel)]="selectedDepartment" 
+        (change)="filterByDepartment()"
+        class="department-select">
+        <option value="">Tous les départements</option>
+        <option *ngFor="let dept of departments" [value]="dept">{{ dept }}</option>
+      </select>
+
+      <button class="clear-filters" (click)="clearFilters()">
+        <span class="clear-icon">🔄</span>
+        Réinitialiser
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-section">
+    <div class="loading-spinner"></div>
+    <p>Chargement des employés...</p>
+  </div>
+
+  <!-- Tableau des employés -->
+  <div *ngIf="!isLoading" class="table-section">
+    <div *ngIf="filteredEmployees.length === 0" class="no-data">
+      <div class="no-data-icon">📭</div>
+      <h3>Aucun employé trouvé</h3>
+      <p>Aucun employé ne correspond à vos critères de recherche.</p>
+    </div>
+
+    <div *ngIf="filteredEmployees.length > 0" class="table-container">
+      <table class="employees-table">
+        <thead>
+          <tr>
+            <th>Nom Complet</th>
+            <th>Email</th>
+            <th>Département</th>
+            <th>Salaire</th>
+            <th>Date d'embauche</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let employee of filteredEmployees" class="employee-row">
+            <td class="employee-name">
+              <div class="avatar">{{ employee.firstName[0] }}{{ employee.lastName[0] }}</div>
+              <div class="name-info">
+                <div class="full-name">{{ employee.firstName }} {{ employee.lastName }}</div>
+                <div *ngIf="employee.phoneNumber" class="phone">{{ employee.phoneNumber }}</div>
+              </div>
+            </td>
+            <td class="email-cell">
+              <a [href]="'mailto:' + employee.email" class="email-link">
+                {{ employee.email }}
+              </a>
+            </td>
+            <td>
+              <span class="department-badge" [class]="'dept-' + employee.department?.toLowerCase()">
+                {{ employee.department || 'Non spécifié' }}
+              </span>
+            </td>
+            <td class="salary-cell">
+              <span class="salary-amount">{{ employee.salary | number:'1.0-0' }} €</span>
+            </td>
+            <td class="hire-date">
+              {{ employee.hireDate ? (employee.hireDate | date: 'dd/MM/yyyy') : 'Non spécifiée' }}
+            </td>
+            <td class="actions-cell">
+              <div class="action-buttons">
+                <button class="btn-view" (click)="viewEmployee(employee.id!)" title="Voir détails">
+                  👁️
+                </button>
+                <button class="btn-edit" (click)="editEmployee(employee.id!)" title="Modifier">
+                  ✏️
+                </button>
+                <button class="btn-delete" (click)="deleteEmployee(employee.id!)" title="Supprimer">
+                  🗑️
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Résumé des résultats -->
+    <div *ngIf="filteredEmployees.length > 0" class="results-summary">
+      <p>
+        Affichage de <strong>{{ filteredEmployees.length }}</strong> 
+        employé{{ filteredEmployees.length > 1 ? 's' : '' }}
+        <span *ngIf="filteredEmployees.length !== employees.length">
+          (sur {{ employees.length }} au total)
+        </span>
+      </p>
+    </div>
+  </div>
+</div>
